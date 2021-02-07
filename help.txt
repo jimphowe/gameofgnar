@@ -1,0 +1,6 @@
+python3.9 manage.py makemigrations gnar_app 		# makes necessary migrations
+python3.9 manage.py sqlmigrate gnar_app XXXX              # does migrations
+python3.9 manage.py migrate gnar_app			# do this with the last one
+
+
+f!YBMhAz!77G
