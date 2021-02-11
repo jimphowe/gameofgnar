@@ -1,7 +1,15 @@
 body {
-  background-color: #ccc;
+  background-color: #ddd;
   margin:0;
-  margin-top:70px;
+  margin-top:48px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+
 }
 
 h1 {
@@ -13,6 +21,22 @@ small {
   color: black;
 }
 
+table, tr, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.climb_photo {
+  height: 600px;
+  width: auto;
+}
+
+.grid_photo {
+  height:100%;
+  width:auto%;
+  max-height:400px;
+}
+
 /* Add a black background color to the top navigation */
 .topnav {
   background-color: #333;
@@ -22,6 +46,7 @@ small {
   position: fixed;
   top: 0;
   width: 100%;
+  height:48px;
 }
 
 /* Style the links inside the navigation bar */
@@ -42,7 +67,13 @@ small {
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: #4CAF50;
+  background-color: #CA0915;
   color: white;
 }
 
+.content {
+	display: flex;
+	flex-flow: column;
+	margin:10px;
+	width:90%;
+}

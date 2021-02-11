@@ -2,11 +2,17 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		  {% block title %}<title>Gnar</title>{% endblock %}
-		  <!--<link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">-->
+		  <title>{% block title %}Gnar{% endblock %}</title>
+		  <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+		  <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
 	</head>
 	<body>
-		  {% block sidebar %}<!-- insert default navigation text for every page -->{% endblock %}
-		    {% block content %}<!-- default content text (typically empty) -->{% endblock %}
+		<div class="topnav">
+			<a class="active" href='/' style="float:left">Game of Gnar</a>
+			{% autoescape off %}
+				{{ account_nav }}
+				{% endautoescape %}
+		</div>
+		<div class="content">{% block content %}<!-- default content text (typically empty) -->{% endblock %}</div>
 	</body>
 </html>

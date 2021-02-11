@@ -17,5 +17,5 @@ class Climb(models.Model):
     grade = models.PositiveIntegerField()
     location = models.CharField(max_length=15,choices=GYMS)
     time_added = models.DateTimeField(auto_now_add=True)
-    picture = models.ImageField(upload_to = "media")
+    picture = models.ImageField(default='image.jpg',upload_to = "media")
     creator = models.CharField(max_length=30)

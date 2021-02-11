@@ -6,19 +6,36 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Climb
 from .forms import ClimbForm, SignUpForm
 
+
+b_log_out = '<a href="/accounts/logout" style="float:right">Log Out</a>'
+b_logged_in_as = lambda request : ('<a href="/" style="float:right">Logged in as: ' + request.user.username + '</a>')
+b_add_climb = '<a href="/add_climb" style="float:right">Add Climb</a>'
+ba_add_climb = '<a class="active" href="/add_climb" style="float:right">Add Climb</a>'
+b_view_climbs = '<a href="/view_climbs" style="float:right">View Climbs</a>'
+ba_view_climbs = '<a class="active" href="/view_climbs" style="float:right">View Climbs</a>'
+b_view_leaderboard = '<a href="/gnar_leaderboard" style="float:right">View Leaderboard</a>'
+ba_view_leaderboard = '<a class="active" href="/gnar_leaderboard" style="float:right">View Leaderboard</a>'
+
+b_log_in = '<a href="/accounts/login" style="float:right">Log In</a>'
+b_sign_up = '<a href="/accounts/signup" style="float:right">Sign Up</a>'
+
+
+
+
 def index(request):
     if request.user.is_authenticated:
-        nav = '<a href="/accounts/logout" style="float:right">Log Out</a><a href="/" style="float:right">Logged in as: ' + request.user.username + '</a>'
+        nav = b_log_out + b_logged_in_as(request) + b_add_climb + b_view_climbs + b_view_leaderboard
     else:
-        nav = '<a href="/accounts/login" style="float:right">Log In</a><a href="/accounts/signup" style="float:right">Sign Up</a>'
+        nav = b_log_in + b_sign_up
     return render(request, 'index.html', {'account_nav': nav})
 
 def climb_by_id(request, climb_id):
     climb = Climb.objects.get(pk=climb_id)
     return render(request, 'climb_details.html', {'climb':climb})
 
-def dump_climbs(request):
-    return render(request, 'dump_climbs.html', {'climb_set': Climb.objects.all().iterator()})
+def view_climbs(request):
+    nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
+    return render(request, 'view_climbs.html', {'climb_set': Climb.objects.all().iterator(), 'account_nav': nav})
 
 def add_climb(request):
     if request.method == 'POST':
@@ -28,7 +45,7 @@ def add_climb(request):
             grade = form.cleaned_data.get("grade"),\
             location = form.cleaned_data.get("location"),\
             picture = form.cleaned_data.get("picture"))
-            obj.creator = request.user
+            obj.creator = str(request.user)
             obj.save()
             print("VALID")
             return HttpResponseRedirect('/')
@@ -36,13 +53,16 @@ def add_climb(request):
             print("INVALID")
     else:
         form = ClimbForm()
-    return render(request, 'add_climb.html', {'form': form})
+    nav = b_log_out + b_logged_in_as(request) + ba_add_climb + b_view_climbs + b_view_leaderboard
+    return render(request, 'add_climb.html', {'form': form, 'account_nav': nav})
+
 
 def trivia_home(request):
     return render(request, 'trivia.html')
 
 def gnar_leaderboard(request):
-    return render(request, 'gnar_leaderboard.html')
+    nav = b_log_out + b_logged_in_as(request) + b_add_climb + b_view_climbs + ba_view_leaderboard
+    return render(request, 'gnar_leaderboard.html', {'account_nav': nav})
 
 def signup(request):
     if request.method == 'POST':

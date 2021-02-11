@@ -1,17 +1,11 @@
+{% extends 'base_generic.html' %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-	<head>
-		<link rel="stylsheet" type="text/css" href="{% static 'css/gnar_leaderboard.css' %}">
-		<title>Leaderboard</title>
-	</head>
-	<body>
-		<h2>Welcome to the leaderboard!</h2>
-		<table>
-			<tr>
-				<td>Jim</td>
-				<td>999 points</td>
-			</tr>
-		</table>
-	</body>
-</html>
+{% block content%}
+	<h2>Leaderboard</h2>
+	<table>
+		<tr>
+			<td>Jim</td>
+			<td>999 points</td>
+		</tr>
+	</table>
+{% endblock %}
