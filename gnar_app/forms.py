@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import GYMS, Climb
+from .models import GYMS, GENERAL_POINTS, WORKOUTS, MEETINGS, Climb, GeneralPoints, MeetingAttended, WorkoutAttended
 
 
 class ClimbForm(forms.ModelForm):
@@ -12,6 +12,33 @@ class ClimbForm(forms.ModelForm):
     class Meta:
         model = Climb
         fields = ('grade', 'location', 'picture')
+
+class GeneralPointsForm(forms.ModelForm):
+    kind = forms.ChoiceField(choices=GENERAL_POINTS)
+    location = forms.ChoiceField(choices=GYMS)
+
+    class Meta:
+        model = GeneralPoints
+        fields = ('kind', 'location')
+    
+class MeetingAttendanceForm(forms.ModelForm):
+    date = forms.ChoiceField(choices=MEETINGS)
+
+    class Meta:
+        model = MeetingAttended
+        fields = ('date',)
+
+
+class WorkoutAttendanceForm(forms.ModelForm):
+    date = forms.ChoiceField(choices=WORKOUTS)
+
+    class Meta:
+        model = WorkoutAttended
+        fields = ('date',)
+
+"""
+class AddOnForm(forms.ModelForm):
+"""
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')

@@ -2,12 +2,30 @@
 {% load static %}
 
 {% block content %}
-<form action="add_climb" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-        {{ form.as_table }}
-    </table>
-    <input type="submit", value="Submit">
-</form>
+<div class="row">
+	<div class="column">
+		<h2>Custom Climb</h2>
+		<form action="add_climb" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			<table>
+			{{ form.as_table }}
+			</table>
+			<input type="submit", value="Submit">
+		</form>
+	</div>
+	<div class="column">
+		<h2>Add-On Game</h2>
+		<p>We will launch add-on at our first practice</p>
+		<!--
+		<form action="" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			<table>
+			{{ form.as_table }}
+			</table>
+			<input type="submit", value="Submit">
+		</form>-->
+	</div>
+</div>
+
 {% endblock %}
 

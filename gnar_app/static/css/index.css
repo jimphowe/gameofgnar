@@ -12,11 +12,6 @@ body {
 
 }
 
-h1 {
-  color: red;
-   outline-style: solid;
-}
-
 small {
   color: black;
 }
@@ -76,4 +71,11 @@ table, tr, th, td {
 	flex-flow: column;
 	margin:10px;
 	width:90%;
+}
+.row {
+	display: flex;
+}
+
+.column {
+	flex: 50%;
 }

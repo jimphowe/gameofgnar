@@ -1,0 +1,54 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Points for {{ username }}: {{ points }}
+<h1>Report additional points</h1>
+<div class="row">
+	<div class="column">
+		<h2>General Points</h2>
+		<form action="profile" method="post">
+			{% csrf_token %}
+			<table>
+			{{ general_form.as_table }}
+			</table>
+			<input type="submit", name="general_points", value="Submit">
+		</form>
+	</div>
+	<div class="column">
+		<h2>Attended Something</h2>
+		<h3>Meeting</h3>
+		<form action="profile" method="post">
+			{% csrf_token %}
+			<table>
+			{{ meeting_form.as_table }}
+			</table>
+			<input type="submit", name="meeting", value="Submit">
+		</form>
+		<h3>Workout</h3>
+		<form action="profile" method="post">
+			{% csrf_token %}
+			<table>
+			{{ workout_form.as_table }}
+			</table>
+			<input type="submit", name="workout", value="Submit">
+		</form>
+	</div>
+</div>
+<h1>Your Point History</h1>
+<table>
+	<tr>
+		<td>Type</td>
+		<td>Date</td>
+		<td>Points</td>
+	</tr>
+{% for entry in point_history %}
+<tr>
+	<td>{{entry.type}}</td>
+	<td>{{entry.date}}</td>
+	<td>{{entry.points}}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

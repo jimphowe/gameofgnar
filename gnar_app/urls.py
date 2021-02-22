@@ -15,6 +15,8 @@ urlpatterns = [
         path('accounts/signup', views.signup, name='signup'),
         path('loggedincheck', views.loggedincheck, name='loggedincheck'),
         path('view_climbs', views.view_climbs, name='view_climbs'),
+        path('profile', views.profile, name='profile'),
+
 ]
 
 if settings.DEBUG:

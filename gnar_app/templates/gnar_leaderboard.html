@@ -4,8 +4,14 @@
 	<h2>Leaderboard</h2>
 	<table>
 		<tr>
-			<td>Jim</td>
-			<td>999 points</td>
+                    <td>Climber</td>
+		    <td>Score</td>
 		</tr>
+	{% for user in user_point_map %}
+	<tr>
+		<td>{{user.user}}</td>
+		<td>{{user.points}}</td>
+	</tr>
+	{% endfor %}
 	</table>
 {% endblock %}
