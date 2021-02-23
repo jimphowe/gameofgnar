@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete
+from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete, MiscellaneousPoints
 from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm
 
 ##########################
@@ -65,6 +65,8 @@ def get_point_history():
     for climb in Climb.objects.all().iterator():
         point_value = 0 if not climb_has_been_completed(climb.id, climb.creator) else 250
         add_key(climb.creator, pack(point_value, "Custom Climb", str(climb.time_added.date().isoformat())))
+    for m_p in MiscellaneousPoints.objects.all().iterator():
+        add_key(m_p.user, pack(m_p.points, m_p.description, str(m_p.time_added.date().isoformat())))
     for g_p in GeneralPoints.objects.all().iterator():
         add_key(g_p.user, pack(points_of_kind(g_p.kind), content_of_enum(g_p.kind, GENERAL_POINTS), str(g_p.time_added.date().isoformat())))
     for meeting in MeetingAttended.objects.all().iterator():
