@@ -1,5 +1,16 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
 <h1>Climb Details</h1>
-<p>Grade: {{ climb.grade }}</p>
-<p>Gym: {{ climb.location }}</p>
-<p>Created on: {{ climb.time_added }}</p>
-<img src="{{ climb.picture }}">
+					<a class="preview-holder" href="{{climb.id}}" >
+						<div class='preview'>
+							<img class="grid_photo" src="{{climb.picture.url}}">
+				<p>V{{climb.grade}} | {{climb.location}} | {{climb.creator}}</p>
+						</div>
+					</a>
+<form action="{{climb.id}}" method="post">{% csrf_token %}
+{% autoescape off %}
+{{ submit }}
+{% endautoescape %}</form>
+{% endblock %}

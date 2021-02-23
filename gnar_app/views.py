@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS
+from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete
 from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm
 
 ##########################
@@ -31,6 +31,19 @@ def redirect_if_not_logged_in(request, callback):
     else:
         return redirect('/')
 
+def completed_climb(climb_id, user):
+    for completion in ClimbComplete.objects.all().iterator():
+        if completion.user == str(user) and completion.climb_id == climb_id:
+            print(completion)
+            return True
+    return False
+
+def climb_has_been_completed(climb_id, user):
+    for completion in ClimbComplete.objects.all().iterator():
+        if completion.user != str(user) and completion.climb_id == climb_id:
+            return True
+    return False
+
 # None -> {user -> [(points, description, time)]}
 def get_point_history():
     points = {}
@@ -50,13 +63,16 @@ def get_point_history():
             if i == val:
                 return s
     for climb in Climb.objects.all().iterator():
-        add_key(climb.creator, pack(250, "Custom Climb", str(climb.time_added.date().isoformat())))
+        point_value = 0 if not climb_has_been_completed(climb.id, climb.creator) else 250
+        add_key(climb.creator, pack(point_value, "Custom Climb", str(climb.time_added.date().isoformat())))
     for g_p in GeneralPoints.objects.all().iterator():
         add_key(g_p.user, pack(points_of_kind(g_p.kind), content_of_enum(g_p.kind, GENERAL_POINTS), str(g_p.time_added.date().isoformat())))
     for meeting in MeetingAttended.objects.all().iterator():
         add_key(meeting.user, pack(100, "Meeting Attended", content_of_enum(meeting.date, MEETINGS)))
     for workout in WorkoutAttended.objects.all().iterator():
-        add_key(workout.user, pack(100, "Workout Attended", content_of_enum(meeting.date, WORKOUTS)))
+        add_key(workout.user, pack(100, "Workout Attended", content_of_enum(workout.date, WORKOUTS)))
+    for completion in ClimbComplete.objects.all().iterator():
+        add_key(completion.user, pack(100, "<a href='../climbs/" + str(completion.climb_id) + "'>Completed Climb " + str(completion.climb_id) + "</a>", str(completion.time_added.date().isoformat())))
     return points
 
 # None -> [(user, points)]
@@ -67,8 +83,9 @@ def get_user_point_map():
         for e in v:
             total += e["points"]
         umap += [{"user":k, "points":total}]
-    umap = sorted(umap, reverse=False, key=(lambda item: item["user"]))
+    umap = sorted(umap, reverse=True, key=(lambda item: item["points"]))
     return umap
+
 
 #############
 # HOME PAGE #
@@ -159,13 +176,33 @@ def profile(request):
                     obj.user = str(request.user)
                     obj.save()
         nav = b_log_out + ba_logged_in_as(request) + b_add_climb + b_view_climbs + b_view_leaderboard
-        points = get_point_history()
-        print(points)
-        if str(request.user) in points:
-            points = points[str(request.user)]
+        point_hist = get_point_history()
+        if str(request.user) in point_hist:
+            point_hist = point_hist[str(request.user)]
         else:
-            points = []
-        return render(request, 'account.html', {'account_nav': nav, 'username':request.user.username, 'general_form':general_form, 'meeting_form':meeting_form, 'workout_form':workout_form, 'points':0, 'point_history': points})
+            point_hist = []
+        points = 0
+        for i in point_hist:
+            points += i["points"]
+        return render(request, 'account.html', {'account_nav': nav, 'username':request.user.username, 'general_form':general_form, 'meeting_form':meeting_form, 'workout_form':workout_form, 'points':points, 'point_history': point_hist})
+    return redirect_if_not_logged_in(request, callback)
+
+def climb_by_id(request, climb_id):
+    def callback(request):
+        climb = Climb.objects.get(pk=climb_id)
+        nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
+        if request.method == 'POST':
+            obj = ClimbComplete.objects.create(climb_id=climb_id)
+            obj.user = str(request.user)
+            obj.save()
+            return HttpResponseRedirect('/climbs/' + str(climb_id))
+        if completed_climb(climb_id, request.user):
+            print(True)
+            submit = '<h2>You have completed this climb</h2>'
+        else:
+            print(False)
+            submit = '<input type="submit", name="submit", value="I did this climb">'
+        return render(request, 'climb_details.html', {'climb':climb, 'account_nav':nav, 'submit':submit})
     return redirect_if_not_logged_in(request, callback)
 
 ################
@@ -178,9 +215,6 @@ def trivia_home(request):
 ##############
 # TEST PAGES #
 ##############
-def climb_by_id(request, climb_id):
-    climb = Climb.objects.get(pk=climb_id)
-    return render(request, 'climb_details.html', {'climb':climb})
 
 def loggedincheck(request):
     if request.user.is_authenticated:

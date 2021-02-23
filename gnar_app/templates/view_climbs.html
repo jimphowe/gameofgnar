@@ -2,22 +2,13 @@
 {% load static %}
 
 {% block content %}
-		<table>
-			<tr>
-				<td>Grade</td>
-				<td>Gym</td>
-				<td>Created on</td>
-				<td>Creator</td>
-				<td>Image</td>
-			</tr>
 		{% for climb in climb_set %}
-			<tr>
-				<td>{{climb.grade}}</td>
-				<td>{{climb.location}}</td>
-				<td>{{climb.time_added}}</td>
-				<td>{{climb.creator}}</td>
-				<td class="climb_photo"><img class="grid_photo" src="{{climb.picture.url}}"></td>
-			</tr>
+					<a class="preview-holder" href="climbs/{{climb.id}}" >
+						<div class='preview'>
+							<img class="grid_photo" src="{{climb.picture.url}}">
+				<p>{{climb.grade}} | {{climb.location}} | {{climb.creator}}</p>
+						</div>
+					</a>
+
 		{% endfor %}
-		</table>
 {% endblock %}

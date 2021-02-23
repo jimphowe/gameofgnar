@@ -44,7 +44,7 @@
 	</tr>
 {% for entry in point_history %}
 <tr>
-	<td>{{entry.type}}</td>
+	<td>{% autoescape off %}{{entry.type}}{% endautoescape %}</td>
 	<td>{{entry.date}}</td>
 	<td>{{entry.points}}</td>
 </tr>

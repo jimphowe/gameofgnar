@@ -12,6 +12,11 @@ body {
 
 }
 
+a {
+  text-decoration: none;
+  font-weight: bold;
+}
+
 small {
   color: black;
 }
@@ -78,4 +83,34 @@ table, tr, th, td {
 
 .column {
 	flex: 50%;
+}
+
+
+
+.preview-holder {
+  display: block;
+  max-width: 1px;
+}
+.preview {
+  top:0px;
+  left:0px;
+  float:left;
+  margin-right:30px;
+  margin-bottom:30px;
+  background-color:#eee;
+  border:1px solid #ccc;
+}
+
+.preview img{
+  display:block;
+}
+	
+.preview p{
+  margin:0;
+  padding:15px 10px;
+  color:#000;
+}
+
+.preview-hover{
+  background-color:#FC5A5A;
 }

@@ -64,6 +64,11 @@ class Climb(models.Model):
     picture = models.ImageField(default='image.jpg',upload_to = "media")
     creator = models.CharField(max_length=30)
 
+class ClimbComplete(models.Model):
+    user = models.CharField(max_length=30)
+    climb_id = models.PositiveIntegerField()
+    time_added = models.DateTimeField(auto_now_add=True)
+
 """
 class AddOn(models.Model):
     grade = models.PositiveIntegerField()

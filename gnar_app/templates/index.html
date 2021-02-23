@@ -2,8 +2,23 @@
 {% load static %}
 
 {% block content %}
-		<div style="text-align:center">
-		<h2>Game of Gnar will open when regular climbing can resume</h2>
-		<a href="https://unofficialnetworks.com/gnar/"><img src="{% static 'images/gnar.jpg' %}" style="display: inline; max-width: 315px"></a>
-		</div>
+<div class="row">
+	<div class="column">
+		<h1>Welcome to Game of Gnar</h1>
+                <h2>Quick Start</h2>
+                <p>Your <a href="/profile">profile</a> page allows you to view your point history and report points.</p>
+		<p><a href="/view_climbs">View climbs</a> made by others on the team, or <a href="/add_climb">submit your own.</a></p>
+                <h2>Scoring</h2>
+		<p>Attend a workout or meeting: 100 points</p>
+		<p>Win a game at a bi-weekly meeting: 500 points</p>
+		<p>Post a climb and have at least one other climber complete it: 250 points (limit 15/month)</p>
+		<p>Do a climb that someone else posted: 100 points</p>
+		<p>Beta so weird a stranger comments on it: 250 points</p>
+		<p>Have breakfast in front of CRG and be first in: 500 points</p>
+		<p>Give a snack to a teammate in need and tell them "it looks like you need this": 250 points (limit 2/month)</p>
+	</div>
+	<div class="column">
+		<a href="https://unofficialnetworks.com/gnar/"><img src="{% static 'images/gnar.jpg' %}" style="display: block; margin: auto; max-width: 315px"></a>
+	</div>
+</div>
 {% endblock %}
