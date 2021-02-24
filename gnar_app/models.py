@@ -63,6 +63,7 @@ class Climb(models.Model):
     time_added = models.DateTimeField(auto_now_add=True)
     picture = models.ImageField(default='image.jpg',upload_to = "media")
     creator = models.CharField(max_length=30)
+    reset = models.BooleanField(default=False)
 
 class ClimbComplete(models.Model):
     user = models.CharField(max_length=30)

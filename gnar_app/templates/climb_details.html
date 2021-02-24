@@ -6,7 +6,18 @@
 					<a class="preview-holder" href="{{climb.id}}" >
 						<div class='preview'>
 							<img class="grid_photo" src="{{climb.picture.url}}">
-				<p>V{{climb.grade}} | {{climb.location}} | {{climb.creator}}</p>
+				<p>V{{climb.grade}} | {{climb.location}} | {{climb.creator}}
+							{% if climb.reset %}
+							{% autoescape off %}
+							| <span style="color:red">Reset</span>
+							{% endautoescape %}
+				                        {% endif %}
+							{% if climb.completed %}
+							{% autoescape off %}
+							| <span style="color:green">Sent</span>
+							{% endautoescape %}
+				                        {% endif %}
+				</p>
 						</div>
 					</a>
 <form action="{{climb.id}}" method="post">{% csrf_token %}

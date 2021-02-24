@@ -34,10 +34,13 @@ def redirect_if_not_logged_in(request, callback):
 def completed_climb(climb_id, user):
     for completion in ClimbComplete.objects.all().iterator():
         if completion.user == str(user) and completion.climb_id == climb_id:
-            print(completion)
             return True
     return False
 
+def annotate_completion(climb, user):
+    climb.completed = completed_climb(climb.id, user)
+
+# NOTE: This is about whether a climb has been completed by anybody except its creator
 def climb_has_been_completed(climb_id, user):
     for completion in ClimbComplete.objects.all().iterator():
         if completion.user != str(user) and completion.climb_id == climb_id:
@@ -122,7 +125,15 @@ def signup(request):
 def view_climbs(request):
     def callback(request):
         nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
-        return render(request, 'view_climbs.html', {'climb_set': Climb.objects.all().iterator(), 'account_nav': nav})
+        climb_set = []
+        re_set = []
+        for climb in Climb.objects.all().iterator():
+            annotate_completion(climb, request.user)
+            if climb.reset:
+                re_set.append(climb)
+            else:
+                climb_set.append(climb)
+        return render(request, 'view_climbs.html', {'re_set': re_set,'climb_set': climb_set, 'account_nav': nav})
     return redirect_if_not_logged_in(request, callback)
 
 def add_climb(request):
@@ -146,7 +157,11 @@ def add_climb(request):
 def gnar_leaderboard(request):
     def callback(request):
         nav = b_log_out + b_logged_in_as(request) + b_add_climb + b_view_climbs + ba_view_leaderboard
-        return render(request, 'gnar_leaderboard.html', {'account_nav': nav, 'user_point_map':get_user_point_map()})
+        user_point_map = [] 
+        for e in get_user_point_map():
+            if e['user'] != "admin":
+                user_point_map.append(e)
+        return render(request, 'gnar_leaderboard.html', {'account_nav': nav, 'user_point_map':user_point_map})
     return redirect_if_not_logged_in(request, callback)
 
 def profile(request):
@@ -192,6 +207,7 @@ def profile(request):
 def climb_by_id(request, climb_id):
     def callback(request):
         climb = Climb.objects.get(pk=climb_id)
+        annotate_completion(climb, request.user)
         nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
         if request.method == 'POST':
             obj = ClimbComplete.objects.create(climb_id=climb_id)
@@ -199,10 +215,8 @@ def climb_by_id(request, climb_id):
             obj.save()
             return HttpResponseRedirect('/climbs/' + str(climb_id))
         if completed_climb(climb_id, request.user):
-            print(True)
             submit = '<h2>You have completed this climb</h2>'
         else:
-            print(False)
             submit = '<input type="submit", name="submit", value="I did this climb">'
         return render(request, 'climb_details.html', {'climb':climb, 'account_nav':nav, 'submit':submit})
     return redirect_if_not_logged_in(request, callback)

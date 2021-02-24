@@ -2,11 +2,44 @@
 {% load static %}
 
 {% block content %}
+<h1>Current Climbs</h1>
 		{% for climb in climb_set %}
 					<a class="preview-holder" href="climbs/{{climb.id}}" >
 						<div class='preview'>
 							<img class="grid_photo" src="{{climb.picture.url}}">
-				<p>{{climb.grade}} | {{climb.location}} | {{climb.creator}}</p>
+							<p>V{{climb.grade}} | {{climb.location}} | {{climb.creator}}
+							{% if climb.reset %}
+							{% autoescape off %}
+							| <span style="color:red">Reset</span>
+							{% endautoescape %}
+				                        {% endif %}
+							{% if climb.completed %}
+							{% autoescape off %}
+							| <span style="color:green">Sent</span>
+							{% endautoescape %}
+				                        {% endif %}
+							</p>
+						</div>
+					</a>
+
+		{% endfor %}
+<h1>Old Climbs</h1>
+		{% for climb in re_set %}
+					<a class="preview-holder" href="climbs/{{climb.id}}" >
+						<div class='preview'>
+							<img class="grid_photo" src="{{climb.picture.url}}">
+							<p>V{{climb.grade}} | {{climb.location}} | {{climb.creator}}
+							{% if climb.reset %}
+							{% autoescape off %}
+							| <span style="color:red">Reset</span>
+							{% endautoescape %}
+				                        {% endif %}
+							{% if climb.completed %}
+							{% autoescape off %}
+							| <span style="color:green">Sent</span>
+							{% endautoescape %}
+				                        {% endif %}
+							</p>
 						</div>
 					</a>
 
