@@ -3,6 +3,8 @@
 
 {% block content %}
 <h1>Climb Details</h1>
+<div class="row">
+	<div class="column">
 					<a class="preview-holder" href="{{climb.id}}" >
 						<div class='preview'>
 							<img class="grid_photo" src="{{climb.picture.url}}">
@@ -20,8 +22,30 @@
 				</p>
 						</div>
 					</a>
+</div>
+<div class="column">
 <form action="{{climb.id}}" method="post">{% csrf_token %}
 {% autoescape off %}
 {{ submit }}
 {% endautoescape %}</form>
+</br>
+<form action="{{climb.id}}" method="post">{% csrf_token %}
+{% autoescape off %}
+{{ reset }}
+{% endautoescape %}</form>
+
+<h1>Comments</h1>
+{% for comment in comments %}
+<p style="max-width:500px"><b>{{comment.user}}:</b> {{comment.comment}}</p>
+{% endfor %}
+
+<form action="{{climb.id}}" method="post">
+	{% csrf_token %}
+	<table>
+		{{ comment_form.as_table }}
+	</table>
+	<input type="submit" name="comment_submission", value="Submit">
+</form>
+</div></div>
+
 {% endblock %}

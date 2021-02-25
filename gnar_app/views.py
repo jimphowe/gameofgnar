@@ -3,8 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete, MiscellaneousPoints
-from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm
+from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete, MiscellaneousPoints, Comment, ResetReport
+from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm, CommentForm
 
 ##########################
 # NAVIGATION DEFINITIONS #
@@ -33,6 +33,12 @@ def redirect_if_not_logged_in(request, callback):
 
 def completed_climb(climb_id, user):
     for completion in ClimbComplete.objects.all().iterator():
+        if completion.user == str(user) and completion.climb_id == climb_id:
+            return True
+    return False
+
+def complained_climb(climb_id, user):
+    for completion in ResetReport.objects.all().iterator():
         if completion.user == str(user) and completion.climb_id == climb_id:
             return True
     return False
@@ -209,16 +215,40 @@ def climb_by_id(request, climb_id):
         climb = Climb.objects.get(pk=climb_id)
         annotate_completion(climb, request.user)
         nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
+        form = CommentForm()
         if request.method == 'POST':
-            obj = ClimbComplete.objects.create(climb_id=climb_id)
-            obj.user = str(request.user)
-            obj.save()
-            return HttpResponseRedirect('/climbs/' + str(climb_id))
+            if 'comment_submission' in request.POST:
+                form = CommentForm(request.POST)
+                if form.is_valid():
+                    obj = Comment.objects.create(\
+                    comment = form.cleaned_data.get("comment"),\
+                    climb_id = climb_id)
+                    obj.user = str(request.user)
+                    obj.save()
+                    return HttpResponseRedirect('/climbs/' + str(climb_id))
+            elif 'completion' in request.POST:
+                obj = ClimbComplete.objects.create(climb_id=climb_id)
+                obj.user = str(request.user)
+                obj.save()
+                return HttpResponseRedirect('/climbs/' + str(climb_id))
+            elif 'reset_report' in request.POST:
+                obj = ResetReport.objects.create(climb_id=climb_id)
+                obj.user = str(request.user)
+                obj.save()
+                return HttpResponseRedirect('/climbs/' + str(climb_id))
         if completed_climb(climb_id, request.user):
             submit = '<h2>You have completed this climb</h2>'
         else:
-            submit = '<input type="submit", name="submit", value="I did this climb">'
-        return render(request, 'climb_details.html', {'climb':climb, 'account_nav':nav, 'submit':submit})
+            submit = '<input type="submit", name="completion", value="I did this climb">'
+        if complained_climb(climb_id, request.user):
+            reset = "<h2>This climb's reset status is under review</h2>"
+        else:
+            reset = '<input type="submit", name="reset_report", value="I think this climb has been reset.">'
+        comments = []
+        for comment in Comment.objects.all().iterator():
+            if comment.climb_id == climb_id:
+                comments.append(comment)
+        return render(request, 'climb_details.html', {'climb':climb, 'account_nav':nav, 'comments':comments, 'submit':submit, 'comment_form':form, 'reset':reset})
     return redirect_if_not_logged_in(request, callback)
 
 ################

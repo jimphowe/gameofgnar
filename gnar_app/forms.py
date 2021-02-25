@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import GYMS, GENERAL_POINTS, WORKOUTS, MEETINGS, Climb, GeneralPoints, MeetingAttended, WorkoutAttended
+from .models import GYMS, GENERAL_POINTS, WORKOUTS, MEETINGS, Climb, GeneralPoints, MeetingAttended, WorkoutAttended, Comment
 
 
 class ClimbForm(forms.ModelForm):
@@ -36,13 +36,20 @@ class WorkoutAttendanceForm(forms.ModelForm):
         model = WorkoutAttended
         fields = ('date',)
 
+class CommentForm(forms.ModelForm):
+    comment = forms.CharField(max_length=300, required=True, help_text='Max 300 chars.')
+
+    class Meta:
+        model = Comment
+        fields = ('comment',)
+
 """
 class AddOnForm(forms.ModelForm):
 """
 
 class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
-    last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid @northeastern.edu email address.')
 
     class Meta:

@@ -70,6 +70,17 @@ class ClimbComplete(models.Model):
     climb_id = models.PositiveIntegerField()
     time_added = models.DateTimeField(auto_now_add=True)
 
+class Comment(models.Model):
+    user = models.CharField(max_length=30)
+    comment = models.CharField(max_length=300)
+    climb_id = models.PositiveIntegerField()
+    time_added = models.DateTimeField(auto_now_add=True)
+
+class ResetReport(models.Model):
+    user = models.CharField(max_length=30)
+    climb_id = models.PositiveIntegerField()
+    time_added = models.DateTimeField(auto_now_add=True)
+
 """
 class AddOn(models.Model):
     grade = models.PositiveIntegerField()
