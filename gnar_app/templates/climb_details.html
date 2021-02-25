@@ -19,6 +19,10 @@
 							| <span style="color:green">Sent</span>
 							{% endautoescape %}
 				                        {% endif %}
+							| {{ climb.sends }}
+							{% if climb.plural_sends %} sends
+							{% else %} send
+							{% endif %}
 				</p>
 						</div>
 					</a>

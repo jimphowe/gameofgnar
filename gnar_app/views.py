@@ -44,7 +44,22 @@ def complained_climb(climb_id, user):
     return False
 
 def annotate_completion(climb, user):
-    climb.completed = completed_climb(climb.id, user)
+    climb_id = climb.id
+    climb.completed = completed_climb(climb_id, user)
+    sends = 0
+    for completion in ClimbComplete.objects.all().iterator():
+        if completion.climb_id == climb_id:
+            sends += 1
+    climb.sends = sends
+    climb.plural_sends = False if sends == 1 else True
+    """
+    comments = 0
+    for comment in Comment.objects.all().iterator():
+        if comment.climb_id == climb_id:
+            comments += 1
+    climb.comments = comments
+    """
+
 
 # NOTE: This is about whether a climb has been completed by anybody except its creator
 def climb_has_been_completed(climb_id, user):
