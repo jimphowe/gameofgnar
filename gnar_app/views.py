@@ -98,7 +98,9 @@ def get_point_history():
     for workout in WorkoutAttended.objects.all().iterator():
         add_key(workout.user, pack(100, "Workout Attended", content_of_enum(workout.date, WORKOUTS)))
     for completion in ClimbComplete.objects.all().iterator():
-        add_key(completion.user, pack(100, "<a href='../climbs/" + str(completion.climb_id) + "'>Completed Climb " + str(completion.climb_id) + "</a>", str(completion.time_added.date().isoformat())))
+        climb = Climb.objects.get(pk=completion.climb_id)
+        if climb.creator != completion.user:
+            add_key(completion.user, pack(100, "<a href='../climbs/" + str(completion.climb_id) + "'>Completed Climb " + str(completion.climb_id) + "</a>", str(completion.time_added.date().isoformat())))
     return points
 
 # None -> [(user, points)]
