@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
 	<div class="column">
-		<h2>Custom Climb</h2>
+		<h2>New Custom Climb</h2>
 		<form action="add_climb" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<table>
@@ -14,7 +14,8 @@
 		</form>
 	</div>
 	<div class="column">
-		<h2>Add-On Game</h2>
+		<h2>New Add-On Game</h2>
+		<p>To add a move to an existing game, see the <a href="/view_climbs">view climbs page.</a></p>
 		<form action="add_climb" method="post">
 			{% csrf_token %}
 			<table>
