@@ -8,6 +8,7 @@ from django.contrib.staticfiles.urls import static, staticfiles_urlpatterns
 urlpatterns = [
         path('', views.index, name="index"),
         path('climbs/<int:climb_id>', views.climb_by_id, name='climb_by_id'),
+        path('addson/<int:game_id>', views.add_on_by_id, name='game_id'),
         path('add_climb', views.add_climb, name="add_climb"),
         path('gnar_leaderboard', views.gnar_leaderboard, name="gnar_leaderboard"),
         path('trivia', views.trivia_home, name="trivia"),

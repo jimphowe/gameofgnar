@@ -4,3 +4,5 @@ python3.9 manage.py migrate gnar_app			# do this with the last one
 
 
 f!YBMhAz!77G
+
+scp -P 9000 -i ~/.ssh/gnar_rsa pi@gameofgnar.com:~/Documents/server/gnar_site/db.sqlite3 db.sqlite3

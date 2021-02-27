@@ -2,7 +2,26 @@
 {% load static %}
 
 {% block content %}
-<h1>Current Climbs</h1>
+<div style="display:block;max-width:500px">
+	<div class='preview'>
+		<h1>Filter By Gym</h1>
+<form action="view_climbs" method="post">
+	{% csrf_token %}
+<table>
+	{{ form.as_table }}
+</table>
+<input type="submit", name="filter_now", value="Filter">
+<input type="submit", name="clear_filters", value="Clear">
+</form>
+	</div>
+</div>
+<div class="row">
+	<div class="column">
+<div style="display:block;max-width:500px">
+	<div class='preview'>
+		<h1>Current Climbs</h1>
+	</div>
+</div>
 		{% for climb in climb_set %}
 					<a class="preview-holder" href="climbs/{{climb.id}}" >
 						<div class='preview'>
@@ -27,7 +46,11 @@
 					</a>
 
 		{% endfor %}
-<h1>Old Climbs</h1>
+<div style="display:block;max-width:500px">
+	<div class='preview'>
+		<h1>Old Climbs</h1>
+	</div>
+</div>
 		{% for climb in re_set %}
 					<a class="preview-holder" href="climbs/{{climb.id}}" >
 						<div class='preview'>
@@ -52,4 +75,40 @@
 					</a>
 
 		{% endfor %}
+</div>
+<div class="column">
+<div style="display:block;max-width:500px">
+	<div class='preview'>
+		<h1>Current Add-On Games</h1>
+	</div>
+</div>
+		{% for game in adds_on %}
+					<a class="preview-holder" href="addson/{{game.id}}" >
+						<div class='preview'>
+							<img style="height:1px;width:500px">
+							<p>Game {{game.id}} | V{{game.grade}} | {{game.location}} | {{game.participants}}
+							{% if game.plural_parts %} participants
+							{% else %} participant
+							{% endif %}
+							| {{game.moves}}
+							{% if game.plural_moves %} moves
+							{% else %} move
+							{% endif %}
+							{% if climb.reset %}
+							{% autoescape off %}
+							| <span style="color:red">Reset</span>
+							{% endautoescape %}
+				                        {% endif %}
+							</p>
+						</div>
+					</a>
+
+		{% endfor %}
+<div style="display:block;max-width:500px">
+	<div class='preview'>
+		<h1>Old Add-On Games</h1>
+	</div>
+</div>
+</div>
+</div>
 {% endblock %}

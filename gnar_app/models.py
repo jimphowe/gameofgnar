@@ -75,11 +75,29 @@ class Comment(models.Model):
     comment = models.CharField(max_length=300)
     climb_id = models.PositiveIntegerField()
     time_added = models.DateTimeField(auto_now_add=True)
+    is_climb_comment = models.BooleanField(default=True)
 
 class ResetReport(models.Model):
     user = models.CharField(max_length=30)
     climb_id = models.PositiveIntegerField()
     time_added = models.DateTimeField(auto_now_add=True)
+    is_climb_complaint = models.BooleanField(default=True)
+
+class AddOnGame(models.Model):
+    creator = models.CharField(max_length=30)
+    time_added = models.DateTimeField(auto_now_add=True)
+    grade = models.PositiveIntegerField()
+    location = models.CharField(max_length=15,choices=GYMS)
+    reset = models.BooleanField(default=False)
+
+class AddOnEntry(models.Model):
+    time_added = models.DateTimeField(auto_now_add=True)
+    picture = models.ImageField(default='image.jpg',upload_to = "media")
+    creator = models.CharField(max_length=30)
+    add_on_game = models.PositiveIntegerField()
+    climb_in_game = models.PositiveIntegerField()
+
+
 
 """
 class AddOn(models.Model):

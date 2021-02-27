@@ -3,8 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete, MiscellaneousPoints, Comment, ResetReport
-from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm, CommentForm
+from .models import Climb, GeneralPoints, MeetingAttended, WorkoutAttended, GENERAL_POINTS, MEETINGS, WORKOUTS, ClimbComplete, MiscellaneousPoints, Comment, ResetReport, AddOnGame, AddOnEntry
+from .forms import ClimbForm, SignUpForm, GeneralPointsForm, MeetingAttendanceForm, WorkoutAttendanceForm, CommentForm, AddOnGameForm, AddOnEntryForm, FilterForm
 
 ##########################
 # NAVIGATION DEFINITIONS #
@@ -39,7 +39,13 @@ def completed_climb(climb_id, user):
 
 def complained_climb(climb_id, user):
     for completion in ResetReport.objects.all().iterator():
-        if completion.user == str(user) and completion.climb_id == climb_id:
+        if completion.user == str(user) and completion.climb_id == climb_id and completion.is_climb_complaint:
+            return True
+    return False
+
+def complained_add_on(game_id, user):
+    for completion in ResetReport.objects.all().iterator():
+        if completion.user == str(user) and completion.climb_id == game_id and not completion.is_climb_complaint:
             return True
     return False
 
@@ -156,25 +162,57 @@ def view_climbs(request):
                 re_set.append(climb)
             else:
                 climb_set.append(climb)
-        return render(request, 'view_climbs.html', {'re_set': re_set,'climb_set': climb_set, 'account_nav': nav})
+        adds_on = []
+        for game in AddOnGame.objects.all().iterator():
+            user_set = set()
+            moves = 0
+            for entry in AddOnEntry.objects.all().iterator():
+                if entry.add_on_game == game.id:
+                    user_set.add(entry.creator)
+                    moves += 1
+            game.participants = len(user_set)
+            game.plural_parts = False if game.participants == 1 else True
+            game.moves = moves
+            game.plural_moves = False if moves == 1 else True
+            adds_on.append(game)
+        form = FilterForm()
+        if request.method == 'POST':
+            if 'filter_now' in request.POST:
+                form = FilterForm(request.POST)
+                if form.is_valid():
+                    location_matches = lambda obj: obj.location == form.cleaned_data.get("gym")
+                    re_set = list(filter(location_matches, re_set))
+                    climb_set = list(filter(location_matches, climb_set))
+                    adds_on = list(filter(location_matches, adds_on))
+        return render(request, 'view_climbs.html', {'re_set': re_set,'climb_set': climb_set, 'account_nav': nav, 'adds_on':adds_on, 'form':form})
     return redirect_if_not_logged_in(request, callback)
 
 def add_climb(request):
     def callback(request):
+        form = ClimbForm()
+        add_on_form = AddOnGameForm()
         if request.method == 'POST':
-            form = ClimbForm(request.POST, request.FILES)
-            if form.is_valid():
-                obj = Climb.objects.create(\
-                grade = form.cleaned_data.get("grade"),\
-                location = form.cleaned_data.get("location"),\
-                picture = form.cleaned_data.get("picture"))
-                obj.creator = str(request.user)
-                obj.save()
-                return HttpResponseRedirect('/')
-        else:
-            form = ClimbForm()
+            if 'new_climb' in request.POST: 
+                form = ClimbForm(request.POST, request.FILES)
+                if form.is_valid():
+                    obj = Climb.objects.create(\
+                    grade = form.cleaned_data.get("grade"),\
+                    location = form.cleaned_data.get("location"),\
+                    picture = form.cleaned_data.get("picture"))
+                    obj.creator = str(request.user)
+                    obj.save()
+                    return HttpResponseRedirect('/')
+            elif 'add_on' in request.POST:
+                add_on_form = AddOnGameForm(request.POST)
+                if add_on_form.is_valid():
+                    obj = AddOnGame.objects.create(\
+                    grade = add_on_form.cleaned_data.get("grade"),\
+                    location = add_on_form.cleaned_data.get("location"))
+                    obj.creator = str(request.user)
+                    obj.save()
+                    return HttpResponseRedirect('/')
         nav = b_log_out + b_logged_in_as(request) + ba_add_climb + b_view_climbs + b_view_leaderboard
-        return render(request, 'add_climb.html', {'form': form, 'account_nav': nav})
+        return render(request, 'add_climb.html', {'form': form, 'account_nav': nav, 'add_on_form':add_on_form})
     return redirect_if_not_logged_in(request, callback)
 
 def gnar_leaderboard(request):
@@ -227,6 +265,54 @@ def profile(request):
         return render(request, 'account.html', {'account_nav': nav, 'username':request.user.username, 'general_form':general_form, 'meeting_form':meeting_form, 'workout_form':workout_form, 'points':points, 'point_history': point_hist})
     return redirect_if_not_logged_in(request, callback)
 
+def add_on_by_id(request, game_id):
+    def callback(request):
+        game = AddOnGame.objects.get(pk=game_id)
+        entries = []
+        for entry in AddOnEntry.objects.all().iterator():
+            if entry.add_on_game == game_id:
+                entries.append(entry)
+        entries = sorted(entries, key=(lambda entry: entry.climb_in_game))
+        nav = b_log_out + b_logged_in_as(request) + b_add_climb + ba_view_climbs + b_view_leaderboard
+        form = CommentForm()
+        entry_form = AddOnEntryForm()
+        if request.method == 'POST':
+            if 'comment_submission' in request.POST:
+                form = CommentForm(request.POST)
+                if form.is_valid():
+                    obj = Comment.objects.create(\
+                    comment = form.cleaned_data.get("comment"),\
+                    climb_id = game_id,\
+                    is_climb_comment = False)
+                    obj.user = str(request.user)
+                    obj.save()
+                    return HttpResponseRedirect('/addson/' + str(game_id))
+            elif 'entry_submission' in request.POST:
+                entry_form = AddOnEntryForm(request.POST, request.FILES)
+                if entry_form.is_valid():
+                    obj = AddOnEntry.objects.create(\
+                    picture = entry_form.cleaned_data.get("picture"),\
+                    add_on_game = game_id,\
+                    climb_in_game = len(entries) + 1)
+                    obj.creator = str(request.user)
+                    obj.save()
+                    return HttpResponseRedirect('/addson/' + str(game_id))
+            elif 'reset_report' in request.POST:
+                obj = ResetReport.objects.create(climb_id=game_id,is_climb_complaint=False)
+                obj.user = str(request.user)
+                obj.save()
+                return HttpResponseRedirect('/addson/' + str(game_id))
+        comments = []
+        for comment in Comment.objects.all().iterator():
+            if comment.climb_id == game_id and not comment.is_climb_comment:
+                comments.append(comment)
+        if complained_add_on(game_id, request.user):
+            reset = "<h2>This game's reset status is under review</h2>"
+        else:
+            reset = '<input type="submit", name="reset_report", value="I think this game has been reset.">'
+        return render(request, 'add_on_details.html', {'game':game, 'account_nav':nav, 'comments':comments, 'comment_form':form, 'reset':reset, 'entries':entries, 'are_entries':len(entries) != 0, 'entry_form':entry_form})
+    return redirect_if_not_logged_in(request, callback)
+
 def climb_by_id(request, climb_id):
     def callback(request):
         climb = Climb.objects.get(pk=climb_id)
@@ -263,7 +349,7 @@ def climb_by_id(request, climb_id):
             reset = '<input type="submit", name="reset_report", value="I think this climb has been reset.">'
         comments = []
         for comment in Comment.objects.all().iterator():
-            if comment.climb_id == climb_id:
+            if comment.climb_id == climb_id and comment.is_climb_comment:
                 comments.append(comment)
         return render(request, 'climb_details.html', {'climb':climb, 'account_nav':nav, 'comments':comments, 'submit':submit, 'comment_form':form, 'reset':reset})
     return redirect_if_not_logged_in(request, callback)
