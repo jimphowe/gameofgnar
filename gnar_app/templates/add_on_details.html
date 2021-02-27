@@ -1,0 +1,55 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+<h1>V{{game.grade}} Add-On at CRG {{game.location}}</h1>
+<div class="row">
+	<div class="column">
+	<h3>Add the next move:</h3>
+	<form action="{{game.id}}" method="post" enctype="multipart/form-data">{% csrf_token %}
+		<table>
+			{{ entry_form.as_table }}
+		</table>
+		<input type="submit" name="entry_submission", value="Submit">
+	</form>
+		{% if are_entries %}
+		{% for entry in entries %}
+					<a class="preview-holder" href="{{game.id}}" >
+						<div class='preview'>
+							<img class="grid_photo" src="{{entry.picture.url}}">
+							<p>Move {{entry.climb_in_game}} | By {{entry.creator}}</p>
+						</div>
+					</a>
+					{% endfor %}
+					{% else %} <p>There are no entries in this game yet.</p>
+					{% endif %}
+
+</div>
+<div class="column">
+	<!--
+<form action="{{climb.id}}" method="post">{% csrf_token %}
+{% autoescape off %}
+{{ submit }}
+{% endautoescape %}</form>
+</br>
+	-->
+<form action="{{game.id}}" method="post">{% csrf_token %}
+{% autoescape off %}
+{{ reset }}
+{% endautoescape %}</form>
+
+<h1>Comments</h1>
+{% for comment in comments %}
+<p style="max-width:500px"><b>{{comment.user}}:</b> {{comment.comment}}</p>
+{% endfor %}
+
+<form action="{{game.id}}" method="post">
+	{% csrf_token %}
+	<table>
+		{{ comment_form.as_table }}
+	</table>
+	<input type="submit" name="comment_submission", value="Submit">
+</form>
+</div></div>
+
+{% endblock %}
