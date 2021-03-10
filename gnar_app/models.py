@@ -10,7 +10,13 @@ GYMS = [
     ('Cambridge','Cambridge'),
     ('Watertown','Watertown'),
     ('Stoneham','Stoneham'),
-    ('Randolph','Randolph')
+    ('Randolph','Randolph'),
+    ('New Haven','New Haven')
+]
+
+SCHOOLS = [
+        ('Northeastern','Northeastern'),
+        ('Yale','Yale'),
 ]
 
 WORKOUTS = [
@@ -19,12 +25,24 @@ WORKOUTS = [
         (3,'February 11th'),
         (4,'February 18th'),
         (5,'February 25th'),
+        (6,'March 4th'),
+        (7,'March 11th'),
+        (8,'March 18th'),
+        (9,'March 25th'),
+        (10,'April 1st'),
+        (11,'April 8th'),
+        (12,'April 15th'),
+        (13,'April 22nd'),
 ]
 
 MEETINGS = [
         (1, 'February 2nd'),
         (2, 'February 16th'),
         (3, 'March 2nd'),
+        (4, 'March 16th'),
+        (5, 'March 30th'),
+        (6, 'April 13th'),
+        (7, 'April 27th'),
 ]
 
 GENERAL_POINTS = [
